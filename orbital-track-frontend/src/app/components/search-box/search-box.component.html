@@ -1,0 +1,46 @@
+<div class="relative">
+
+  <!-- Input row -->
+  <div class="flex items-center rounded bg-gray-900/80 border border-gray-700 backdrop-blur overflow-hidden">
+    <input
+      #inputEl
+      type="text"
+      placeholder="Search name, NORAD ID, country…"
+      [value]="query()"
+      (input)="onInput($any($event.target).value)"
+      class="bg-transparent px-3 py-1.5 text-xs text-white placeholder-gray-500 outline-none w-52"
+    />
+    @if (loading()) {
+      <span class="pr-2 text-gray-500 text-xs">…</span>
+    } @else if (query().length > 0) {
+      <button (click)="clear()" class="pr-2 text-gray-500 hover:text-white text-xs leading-none">✕</button>
+    }
+  </div>
+
+  <!-- Dropdown results -->
+  @if (open()) {
+    <div class="absolute top-full left-0 mt-1 w-72 rounded-lg bg-gray-900/95 border border-gray-700 shadow-xl z-50 overflow-hidden">
+      @for (sat of results(); track sat.noradCatId) {
+        <button
+          (click)="select(sat)"
+          class="w-full text-left px-3 py-2 text-xs hover:bg-gray-700/60 transition-colors border-b border-gray-800 last:border-0"
+        >
+          <div class="flex items-baseline justify-between gap-2">
+            <span class="text-white font-medium truncate">{{ sat.name }}</span>
+            <span class="text-gray-400 shrink-0">#{{ sat.noradCatId }}</span>
+          </div>
+          <div class="flex gap-2 mt-0.5 text-gray-500">
+            <span>{{ sat.orbitRegime }}</span>
+            <span>·</span>
+            <span>{{ sat.objectType }}</span>
+            @if (sat.countryCode) {
+              <span>·</span>
+              <span>{{ sat.countryCode }}</span>
+            }
+          </div>
+        </button>
+      }
+    </div>
+  }
+
+</div>

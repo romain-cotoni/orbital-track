@@ -1,0 +1,10 @@
+# env prd variables (mots de passe DB, Space-Track, token Cesium).
+.env
+
+# IDE
+/.vscode/
+/.idea/
+
+# OS
+.DS_Store
+Thumbs.db

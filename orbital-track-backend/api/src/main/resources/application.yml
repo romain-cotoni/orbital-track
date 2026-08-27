@@ -1,0 +1,45 @@
+spring:
+  application:
+    name: Orbital Tracker
+
+  # Profils :
+  #   dev   -> tout en local depuis l'IDE, seule la DB tourne dans Docker
+  #   local -> toute la stack dans Docker sur le poste de dev
+  #   prd   -> production (VPS)
+  # dev et local partagent leur comportement non-production via le groupe
+  # "nonprd" (Space-Track de test, logs verbeux) : ils ne different que par
+  # l'infrastructure (URL de la DB, chemin Orekit).
+  profiles:
+    group:
+      dev: nonprd
+      local: nonprd
+
+  # Identique dans les trois environnements.
+  datasource:
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: false
+
+server:
+  servlet:
+    context-path: /api
+
+# Credentials Space-Track, fournis par l'environnement (.env via docker compose,
+# ou run configuration de l'IDE).
+spacetrack:
+  identity: ${SPACETRACK_IDENTITY:}
+  password: ${SPACETRACK_PASSWORD:}

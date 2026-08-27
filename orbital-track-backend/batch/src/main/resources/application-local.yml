@@ -1,0 +1,18 @@
+# Profil local : toute la stack tourne dans Docker sur le poste de dev
+# (docker compose up -d --build, avec SPRING_PROFILE=local dans le .env).
+spring:
+  config:
+    activate:
+      on-profile: local
+
+  datasource:
+    # "postgres" est le nom du service dans docker-compose.db.yml.
+    url: ${DB_URL:jdbc:postgresql://postgres:5432/satellite-tracker-db}
+
+orekit:
+  data:
+    # Chemin ou batch/Dockerfile copie les donnees Orekit. Cette section etait
+    # absente des configs du batch : la variable OREKIT_DATA_PATH fournie par
+    # docker-compose.yml n'etait jamais lue, et le service retombait
+    # silencieusement sur le classpath.
+    path: ${OREKIT_DATA_PATH:/app/orekit-data}

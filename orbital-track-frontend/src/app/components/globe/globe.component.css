@@ -1,0 +1,4 @@
+/* Remove Cesium's default credit/logo bar at the bottom */
+:host ::ng-deep .cesium-widget-credits {
+  display: none !important;
+}

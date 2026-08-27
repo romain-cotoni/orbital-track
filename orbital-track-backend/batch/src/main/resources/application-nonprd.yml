@@ -1,0 +1,54 @@
+# Comportement partage par les profils dev et local (voir spring.profiles.group
+# dans application.yml) : endpoint Space-Track de test et crons rapides.
+# Aucun reglage d'infrastructure ici -- voir application-dev.yml / -local.yml.
+spring:
+  config:
+    activate:
+      on-profile: nonprd
+
+spacetrack:
+  # Endpoint de test par defaut hors production : on peut s'y tromper sans
+  # risquer un bannissement. Surchargeable via SPACETRACK_BASE_URL pour taper
+  # ponctuellement le vrai endpoint depuis dev ou local.
+  base-url: ${SPACETRACK_BASE_URL:https://for-testing-only.space-track.org}
+
+# Crons rapides et decales d'une minute par regime, pour voir passer les jobs
+# sans attendre. Retries courts.
+sattrack:
+  batch:
+    leo:
+      group: ""                # fetch all object types (payload, debris, rocket body)
+      orbit-type: "LEO"
+      epoch-window: "30d"
+      exclude-decayed: true
+      cleanup-threshold-days: 35
+      chunk-size: 500
+      cron: "0 0/5 * * * *" # every 5 min
+      retry-delay-ms: 30000     # 30 seconds between retries
+    meo:
+      group: ""
+      orbit-type: "MEO"
+      epoch-window: "30d"
+      exclude-decayed: true
+      cleanup-threshold-days: 35
+      chunk-size: 500
+      cron: "0 1/5 * * * *" # every 5 min, offset 1 min
+      retry-delay-ms: 30000
+    heo:
+      group: ""
+      orbit-type: "HEO"
+      epoch-window: "72h"
+      exclude-decayed: true
+      cleanup-threshold-days: 14
+      chunk-size: 500
+      cron: "0 2/5 * * * *" # every 5 min, offset 2 min
+      retry-delay-ms: 30000
+    geo:
+      group: ""
+      orbit-type: "GEO"
+      epoch-window: "180d"
+      exclude-decayed: true
+      cleanup-threshold-days: 60
+      chunk-size: 500
+      cron: "0 3/5 * * * *" # every 5 min, offset 3 min
+      retry-delay-ms: 30000

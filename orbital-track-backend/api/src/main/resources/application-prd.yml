@@ -1,0 +1,19 @@
+# Profil prd : production sur le VPS (SPRING_PROFILE=prd dans le .env).
+spring:
+  config:
+    activate:
+      on-profile: prd
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://postgres:5432/satellite-tracker-db}
+
+orekit:
+  data:
+    # Configurable, avec pour defaut le chemin ou api/Dockerfile copie les
+    # donnees. Etait code en dur auparavant, ce qui rendait OREKIT_DATA_PATH
+    # silencieusement inoperant en production.
+    path: ${OREKIT_DATA_PATH:/app/orekit-data}
+
+logging:
+  level:
+    space.satellite.websocket: INFO

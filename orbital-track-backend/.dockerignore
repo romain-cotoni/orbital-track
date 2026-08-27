@@ -1,0 +1,7 @@
+# Le contexte de build est la racine du backend (voir docker-compose.yml).
+# Les Dockerfiles recompilent tout dans l'image : les artefacts locaux
+# n'ont rien a y faire et alourdiraient le contexte a chaque mvn package.
+target/
+*/target/
+.idea/
+*.iml

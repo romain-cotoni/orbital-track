@@ -1,0 +1,19 @@
+# Profil local : toute la stack tourne dans Docker sur le poste de dev
+# (docker compose up -d --build, avec SPRING_PROFILE=local dans le .env).
+#
+# Meme infrastructure que la prod -- c'est tout l'interet : on teste en local
+# exactement ce qui partira sur le VPS. Seul le comportement differe, via le
+# groupe nonprd (Space-Track de test, logs verbeux).
+spring:
+  config:
+    activate:
+      on-profile: local
+
+  datasource:
+    # "postgres" est le nom du service dans docker-compose.db.yml.
+    url: ${DB_URL:jdbc:postgresql://postgres:5432/satellite-tracker-db}
+
+orekit:
+  data:
+    # Chemin ou batch/Dockerfile et api/Dockerfile copient les donnees Orekit.
+    path: ${OREKIT_DATA_PATH:/app/orekit-data}

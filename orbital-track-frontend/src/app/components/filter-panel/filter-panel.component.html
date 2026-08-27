@@ -1,0 +1,56 @@
+<div class="flex flex-col gap-4 p-4 text-sm text-white">
+
+  <!-- Object Type -->
+  <div>
+    <p class="mb-1 text-xs font-semibold uppercase tracking-wider text-gray-400">Object Type</p>
+    @for (type of filter.allObjectTypes(); track type) {
+      <label class="flex items-center gap-2 py-0.5 cursor-pointer hover:text-gray-200">
+        <input type="checkbox" [checked]="filter.objectTypes().has(type)" (change)="filter.toggleObjectType(type)" class="accent-blue-500"/>
+        <span [class]="labelColor(type)">{{ type }}</span>
+      </label>
+    }
+  </div>
+
+  <!-- Orbit Regime -->
+  <div>
+    <p class="mb-1 text-xs font-semibold uppercase tracking-wider text-gray-400">Orbit Regime</p>
+    @for (regime of filter.allOrbitRegimes(); track regime) {
+      <label class="flex items-center gap-2 py-0.5 cursor-pointer hover:text-gray-200">
+        <input type="checkbox" [checked]="filter.orbitRegimes().has(regime)" (change)="filter.toggleOrbitRegime(regime)" class="accent-blue-500"/>
+        {{ regime }}
+      </label>
+    }
+  </div>
+
+  <!-- Constellation -->
+  @if (filter.allConstellations().size > 0) {
+    <div>
+      <p class="mb-1 text-xs font-semibold uppercase tracking-wider text-gray-400">Constellation</p>
+      @for (constellation of filter.allConstellations(); track constellation) {
+        <label class="flex items-center gap-2 py-0.5 cursor-pointer hover:text-gray-200">
+          <input type="checkbox" [checked]="filter.constellations().has(constellation)" (change)="filter.toggleConstellation(constellation)" class="accent-blue-500"/>
+          {{ constellation }}
+        </label>
+      }
+    </div>
+  }
+
+  <!-- Mission Type -->
+  @if (filter.allMissionTypes().size > 0) {
+    <div>
+      <p class="mb-1 text-xs font-semibold uppercase tracking-wider text-gray-400">Mission Type</p>
+      @for (mt of filter.allMissionTypes(); track mt) {
+        <label class="flex items-center gap-2 py-0.5 cursor-pointer hover:text-gray-200">
+          <input type="checkbox" [checked]="filter.missionTypes().has(mt)" (change)="filter.toggleMissionType(mt)" class="accent-blue-500"/>
+          {{ missionTypeLabel(mt) }}
+        </label>
+      }
+    </div>
+  }
+
+  <!-- Clear -->
+  <button (click)="filter.clearAll()" class="mt-2 rounded border border-gray-600 px-3 py-1 text-xs text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">
+    Clear filters
+  </button>
+
+</div>

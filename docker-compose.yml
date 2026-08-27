@@ -1,0 +1,73 @@
+# Stack complete : postgres + batch + api + frontend.
+#
+#   docker compose -f docker-compose.db.yml up -d   -> la DB seule (dev IDE)
+#   docker compose up -d --build                    -> tout (ce fichier)
+#
+# Le service postgres n'est pas redefini ici : il est repris tel quel depuis
+# docker-compose.db.yml, qui reste donc l'unique source de verite pour la DB.
+include:
+  - docker-compose.db.yml
+
+services:
+
+  batch:
+    build:
+      context: ./orbital-track-backend
+      dockerfile: batch/Dockerfile
+    # Syntaxe liste (et non map) pour pouvoir utiliser le passe-plat
+    # "- VARIABLE" sur la derniere ligne : si SPACETRACK_BASE_URL est absente
+    # du .env, elle n'est pas injectee dans le conteneur, et Spring applique le
+    # defaut de son profil (endpoint de test hors prod, vrai endpoint en prd).
+    # L'ecrire ici avec une valeur par defaut inverserait cette logique.
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILE:-prd}
+      - DB_URL=jdbc:postgresql://postgres:5432/satellite-tracker-db
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - SPACETRACK_IDENTITY=${SPACETRACK_IDENTITY}
+      - SPACETRACK_PASSWORD=${SPACETRACK_PASSWORD}
+      - OREKIT_DATA_PATH=/app/orekit-data
+      - SPACETRACK_BASE_URL
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ./orbital-track-backend
+      dockerfile: api/Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILE:-prd}
+      DB_URL: jdbc:postgresql://postgres:5432/satellite-tracker-db
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      SPACETRACK_IDENTITY: ${SPACETRACK_IDENTITY}
+      SPACETRACK_PASSWORD: ${SPACETRACK_PASSWORD}
+      OREKIT_DATA_PATH: /app/orekit-data
+    ports:
+      # Loopback uniquement : Postman/curl en local, mais l'API n'est pas
+      # joignable de l'exterieur sur le VPS -- tout passe par nginx.
+      - "127.0.0.1:8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./orbital-track-frontend
+      dockerfile: Dockerfile
+      args:
+        # Fige le --base-href du build Angular dans l'image.
+        BASE_PATH: ${BASE_PATH:-/}
+        # Remplace le placeholder __CESIUM_TOKEN__ de environment.prod.ts.
+        CESIUM_TOKEN: ${CESIUM_TOKEN:-}
+    environment:
+      # Consomme par envsubst sur nginx.conf.template au demarrage du conteneur.
+      BASE_PATH: ${BASE_PATH:-/}
+    ports:
+      - "${FRONTEND_PORT:-80}:80"
+    depends_on:
+      - api
+    restart: unless-stopped

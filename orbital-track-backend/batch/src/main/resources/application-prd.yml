@@ -1,0 +1,59 @@
+# Profil prd : production sur le VPS (SPRING_PROFILE=prd dans le .env).
+spring:
+  config:
+    activate:
+      on-profile: prd
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://postgres:5432/satellite-tracker-db}
+
+orekit:
+  data:
+    # Section absente auparavant : OREKIT_DATA_PATH n'etait jamais lu par le
+    # batch, malgre le COPY /app/orekit-data de batch/Dockerfile.
+    path: ${OREKIT_DATA_PATH:/app/orekit-data}
+
+spacetrack:
+  # Vrai endpoint par defaut en production. Surchargeable via SPACETRACK_BASE_URL
+  # pour basculer sur celui de test (ex. valider un deploiement sans consommer
+  # le quota ni risquer un bannissement).
+  base-url: ${SPACETRACK_BASE_URL:https://www.space-track.org}
+
+sattrack:
+  batch:
+    leo:
+      group: ""
+      orbit-type: "LEO"
+      epoch-window: "30d"
+      exclude-decayed: true
+      cleanup-threshold-days: 35
+      chunk-size: 500
+      cron: "0 17 */2 * * *"
+      retry-delay-ms: 180000   # 3 minutes between retries
+    meo:
+      group: ""
+      orbit-type: "MEO"
+      epoch-window: "30d"
+      exclude-decayed: true
+      cleanup-threshold-days: 35
+      chunk-size: 500
+      cron: "0 27 0 * * *"      # daily at midnight
+      retry-delay-ms: 180000
+    heo:
+      group: ""
+      orbit-type: "HEO"
+      epoch-window: "72h"
+      exclude-decayed: true
+      cleanup-threshold-days: 14
+      chunk-size: 500
+      cron: "0 37 */12 * * *"   # every 12 hours
+      retry-delay-ms: 180000
+    geo:
+      group: ""
+      orbit-type: "GEO"
+      epoch-window: "180d"
+      exclude-decayed: true
+      cleanup-threshold-days: 60
+      chunk-size: 500
+      cron: "0 47 0 * * SUN"    # weekly on Sunday
+      retry-delay-ms: 180000

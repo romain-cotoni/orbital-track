@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: Orbital Tracker - Batch
+
+  # Voir api/src/main/resources/application.yml pour la description des profils.
+  profiles:
+    group:
+      dev: nonprd
+      local: nonprd
+
+  main:
+    web-application-type: none   # Batch has no HTTP server — avoids port conflict with API
+
+  # Identique dans les trois environnements.
+  datasource:
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: false  # Jobs are triggered by SatelliteJobScheduler, not on startup
+
+# Credentials Space-Track, fournis par l'environnement. L'URL de base depend du
+# profil : endpoint de test hors production.
+spacetrack:
+  identity: ${SPACETRACK_IDENTITY:}
+  password: ${SPACETRACK_PASSWORD:}

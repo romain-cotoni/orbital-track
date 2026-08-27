@@ -1,0 +1,11 @@
+# Comportement partage par les profils dev et local (voir spring.profiles.group
+# dans application.yml). Ne contient AUCUN reglage d'infrastructure : les URL de
+# DB et le chemin Orekit sont dans application-dev.yml / application-local.yml.
+spring:
+  config:
+    activate:
+      on-profile: nonprd
+
+logging:
+  level:
+    space.satellite.websocket: DEBUG

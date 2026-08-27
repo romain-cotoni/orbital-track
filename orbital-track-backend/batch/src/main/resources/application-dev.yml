@@ -1,0 +1,22 @@
+# Profil dev : le batch tourne depuis l'IDE, seule la DB est dans Docker
+# (docker compose -f docker-compose.db.yml up -d).
+#
+# Valeurs par defaut alignees sur .env.example pour un lancement IDE immediat.
+# Identifiants strictement locaux, jamais ceux du VPS.
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  datasource:
+    # docker-compose.db.yml publie postgres sur 127.0.0.1:5432
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/satellite-tracker-db}
+    username: ${DB_USERNAME:orbital}
+    password: ${DB_PASSWORD:changeme}
+
+orekit:
+  data:
+    # Laisse vide par defaut : SatellitePositionService retombe alors sur le
+    # repertoire du repo puis sur le classpath. Renseigne OREKIT_DATA_PATH pour
+    # pointer explicitement un autre jeu de donnees.
+    path: ${OREKIT_DATA_PATH:}

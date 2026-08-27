@@ -1,0 +1,23 @@
+services:
+
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: satellite-tracker-db
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      # Lie sur la loopback uniquement : accessible depuis l'IDE / psql sur cette
+      # machine, jamais depuis l'exterieur, y compris sur le VPS.
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d satellite-tracker-db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
